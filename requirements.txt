@@ -1,0 +1,9 @@
+streamlit
+pandas
+numpy
+matplotlib
+scikit-learn
+statsmodels
+joblib
+tensorflow-cpu==2.13.0
+openpyxl
