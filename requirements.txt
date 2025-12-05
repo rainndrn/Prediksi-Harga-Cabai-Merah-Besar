@@ -7,3 +7,4 @@ statsmodels
 joblib
 tensorflow-cpu==2.13.0
 openpyxl
+gdown
