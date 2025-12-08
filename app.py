@@ -61,7 +61,7 @@ df["day"] = df['tanggal_lengkap'].dt.day
 df["month"] = df['tanggal_lengkap'].dt.month
 df["year"] = df['tanggal_lengkap'].dt.year
 
-X = df[["day", "month", "year"]]
+X = df[["year", "month", "day"]]
 y = df["cabe_merah_besar"]
 
 # ============================
@@ -111,3 +111,4 @@ st.plotly_chart(fig2, use_container_width=True)
 
 st.success("Prediksi Selesai! 🎉")
 st.write("👩‍💻 Model: XGBoost Regression")
+
