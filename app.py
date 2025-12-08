@@ -74,7 +74,7 @@ def forecast_xgb_multi(xgb_model, history_series, h, lags=[1,7,14]):
 st.markdown("<h1 style='color:#b30000'>Prediksi Harga Cabai Merah Besar — SARIMA & XGBoost</h1>", unsafe_allow_html=True)
 st.write("Upload file CSV dengan format: `tanggal` (kolom pertama) dan `cabe_merah_besar` (kolom harga).")
 
-uploaded = st.file_uploader("Upload CSV (date, cabe_merah_besar)", type=["csv"])
+uploaded = st.file_uploader("Upload CSV (tanggal_lengkap, cabe_merah_besar)", type=["csv"])
 
 horizon = st.number_input("Horizon prediksi (hari)", min_value=1, max_value=90, value=30)
 run_btn = st.button("Proses & Prediksi")
@@ -207,4 +207,5 @@ if uploaded is not None:
             st.download_button(label="Download hasil prediksi (CSV)", data=csv_bytes, file_name="forecast_cabe.csv", mime="text/csv")
 
 else:
+
     st.info("Silakan upload dataset CSV terlebih dahulu.")
