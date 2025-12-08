@@ -19,25 +19,20 @@ st.write("Menggunakan **XGBoost Regression**")
 # ============================
 # LOAD DATA
 # ============================
-FILE_PATH = "cabe_merah_besar.csv"
+uploaded_file = st.file_uploader("📂 Upload dataset CSV", type=["csv"])
 
 @st.cache_data
-def load_data():
-    df = pd.read_csv(FILE_PATH)
-
-    # Parsing format tanggal unik: "1 01 2023"
-    try:
-        df['tanggal_lengkap'] = pd.to_datetime(df['tanggal_lengkap'], format="%d %m %Y")
-    except:
-        df['tanggal_lengkap'] = pd.to_datetime(df['tanggal_lengkap'])
-
+def load_data(file):
+    df = pd.read_csv(file)
+    df['tanggal_lengkap'] = pd.to_datetime(df['tanggal_lengkap'])
     df = df.sort_values('tanggal_lengkap')
     return df
 
-df = load_data()
-
-st.subheader("📊 Data Historis")
-st.dataframe(df.tail())
+if uploaded_file is not None:
+    df = load_data(uploaded_file)
+else:
+    st.warning("Silakan upload file `cabai_merah_besar.csv` terlebih dahulu!")
+    st.stop()
 
 # ============================
 # FEATURE ENGINEERING
@@ -129,3 +124,4 @@ st.download_button(label="Download CSV Prediksi 🌶️",
 
 st.success("Prediksi selesai!")
 st.caption("👩‍💻 Model: XGBoost Regression | Dibuat dengan Streamlit")
+
