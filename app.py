@@ -19,20 +19,28 @@ st.write("Menggunakan **XGBoost Regression**")
 # ============================
 # LOAD DATA
 # ============================
-uploaded_file = st.file_uploader("📂 Upload dataset CSV", type=["csv"])
-
 @st.cache_data
 def load_data(file):
     df = pd.read_csv(file)
-    df['tanggal_lengkap'] = pd.to_datetime(df['tanggal_lengkap'])
-    df = df.sort_values('tanggal_lengkap')
-    return df
 
-if uploaded_file is not None:
-    df = load_data(uploaded_file)
-else:
-    st.warning("Silakan upload file `cabai_merah_besar.csv` terlebih dahulu!")
-    st.stop()
+    # rapikan kolom agar bebas spasi & huruf kecil semua
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
+    # cek apakah kolom wajib ada
+    required_cols = ["tanggal_lengkap", "cabe_merah_besar"]
+    missing = [col for col in required_cols if col not in df.columns]
+
+    if missing:
+        st.error(f"Kolom berikut tidak ditemukan dalam file CSV: {missing}")
+        st.stop()
+
+    df["tanggal_lengkap"] = pd.to_datetime(df["tanggal_lengkap"], dayfirst=True, errors="coerce")
+
+    if df["tanggal_lengkap"].isna().any():
+        st.warning("⚠ Ada tanggal yang gagal diparsing. Pastikan format tanggal benar, misal: 01-01-2023")
+
+    df = df.sort_values("tanggal_lengkap")
+    return df
 
 # ============================
 # FEATURE ENGINEERING
@@ -124,4 +132,5 @@ st.download_button(label="Download CSV Prediksi 🌶️",
 
 st.success("Prediksi selesai!")
 st.caption("👩‍💻 Model: XGBoost Regression | Dibuat dengan Streamlit")
+
 
