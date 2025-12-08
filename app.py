@@ -193,7 +193,6 @@ else:
         last_date = pd.to_datetime(df['tanggal_lengkap'].max())
     else:
         last_date = pd.to_datetime("today").normalize()
-    try:
         # If SARIMAXResults-like
         if hasattr(model, "get_forecast"):
             forecast_obj = model.get_forecast(steps=horizon)
@@ -230,3 +229,4 @@ else:
             ax2.legend()
             ax2.grid(True)
             st.pyplot(fig2)
+
