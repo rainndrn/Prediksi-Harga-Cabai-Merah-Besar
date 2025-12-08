@@ -4,12 +4,14 @@ import numpy as np
 import pickle
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
+import gzip
+import pickle
 
 # ===== Load Model =====
 @st.cache_resource
 def load_sarima():
-    with open("model_sarima.zip", "rb") as f:
-        model = pickle.load(f)
+    with gzip.open("model_sarima.pkl.gz", "rb") as f:
+        model_sarima = pickle.load(f)
     return model
 
 model = load_sarima()
@@ -42,4 +44,5 @@ if st.button("Prediksi Sekarang"):
 
 st.markdown("---")
 st.info("Model: SARIMA • Dibuat tanpa TensorFlow supaya stabil untuk deployment Streamlit.")
+
 
