@@ -21,7 +21,7 @@ st.markdown("Menggunakan **XGBoost Regression**")
 # ============================
 # LOAD DATA
 # ============================
-FILE_PATH = "data/cabai_merah_besar.csv"  # ubah kalau nama file berbeda
+FILE_PATH = "cabai_merah_besar.csv"  # ubah kalau nama file berbeda
 
 @st.cache_data
 def load_data():
@@ -105,5 +105,6 @@ st.success("Prediksi selesai!")
 
 st.write("📌 Model: XGBoost Regression")
 st.write("👩‍💻 Dibuat dengan Streamlit")
+
 
 
