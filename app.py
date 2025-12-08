@@ -18,7 +18,7 @@ def load_model(path="model/model_sarima.pkl.gz"):
 
 @st.cache_data
 def load_sample_data(path="data/cabai merah besar.csv"):
-    df = pd.read_csv(path, parse_dates=["date"]) if st.sidebar.checkbox("Load bundled sample data", value=False) else None
+    df = pd.read_csv(path, parse_dates=["tanggal_lengkap"]) if st.sidebar.checkbox("Load bundled sample data", value=False) else None
     return df
 
 
@@ -57,7 +57,7 @@ if df is not None:
     st.subheader("Data Historis")
     st.write(df.tail(10))
     fig, ax = plt.subplots()
-    ax.plot(df["date"], df["price"], marker=".")
+    ax.plot(df["tanggal_lengkap"], df["cabe_merah_besar"], marker=".")
     ax.set_xlabel("Date")
     ax.set_ylabel("Harga")
     ax.set_title("Harga Historis")
@@ -103,3 +103,4 @@ else:
 
 st.markdown("---")
 st.markdown("**Catatan:** Pastikan `model/model_sarima.pkl.gz` ada di repo. Jika model disimpan berbeda, ubah path di `load_model()`.")
+
