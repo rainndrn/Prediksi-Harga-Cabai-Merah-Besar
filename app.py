@@ -1,46 +1,58 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from xgboost import XGBRegressor
 import plotly.express as px
-import plotly.graph_objects as go
 
 # ============================
-# CONFIG UI
+# APP CONFIG
 # ============================
-st.set_page_config(page_title="Prediksi Harga Cabai 🌶️",
-                   page_icon="🌶️",
-                   layout="wide")
+st.set_page_config(
+    page_title="Prediksi Harga Cabai Merah Besar",
+    page_icon="🌶️",
+    layout="wide"
+)
 
-st.markdown("<h1 style='color:#b30000'>🌶️ Prediksi Harga Cabai Merah Besar</h1>", unsafe_allow_html=True)
-st.write("Menggunakan **XGBoost Regression**")
+st.title("🌶️ Prediksi Harga Cabai Merah Besar")
+st.markdown("Menggunakan **XGBoost Regression**")
 
 # ============================
-# LOAD DATA
+# Upload Data
 # ============================
+uploaded_file = st.file_uploader("📂 Upload Dataset CSV", type=["csv"])
+
 @st.cache_data
 def load_data(file):
     df = pd.read_csv(file)
 
-    # rapikan kolom agar bebas spasi & huruf kecil semua
+    # rapikan nama kolom
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-    # cek apakah kolom wajib ada
+    # cek kolom wajib
     required_cols = ["tanggal_lengkap", "cabe_merah_besar"]
-    missing = [col for col in required_cols if col not in df.columns]
-
-    if missing:
-        st.error(f"Kolom berikut tidak ditemukan dalam file CSV: {missing}")
-        st.stop()
+    for col in required_cols:
+        if col not in df.columns:
+            st.error(f"Kolom '{col}' tidak ditemukan dalam file CSV ❌")
+            st.stop()
 
     df["tanggal_lengkap"] = pd.to_datetime(df["tanggal_lengkap"], dayfirst=True, errors="coerce")
 
     if df["tanggal_lengkap"].isna().any():
-        st.warning("⚠ Ada tanggal yang gagal diparsing. Pastikan format tanggal benar, misal: 01-01-2023")
+        st.warning("⚠ Format tanggal ada yang error. Pastikan format contoh: 01-01-2023")
 
     df = df.sort_values("tanggal_lengkap")
     return df
+
+if uploaded_file is None:
+    st.info("👆 Silakan upload file CSV terlebih dahulu.")
+    st.stop()
+
+df = load_data(uploaded_file)
+
+st.subheader("📊 Data Historis")
+st.dataframe(df.tail())
 
 # ============================
 # FEATURE ENGINEERING
@@ -55,41 +67,26 @@ y = df["cabe_merah_besar"]
 # ============================
 # TRAIN MODEL
 # ============================
-train_ratio = 0.8
-train_size = int(len(df) * train_ratio)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
-X_train, X_test = X[:train_size], X[train_size:]
-y_train, y_test = y[:train_size], y[train_size:]
-
-model = XGBRegressor(
-    n_estimators=250,
-    learning_rate=0.07,
-    max_depth=5,
-    subsample=0.8,
-    colsample_bytree=0.8,
-    random_state=42
-)
-
+model = XGBRegressor(n_estimators=350, learning_rate=0.05, max_depth=6, subsample=0.8, colsample_bytree=0.8, random_state=42)
 model.fit(X_train, y_train)
+
 y_pred = model.predict(X_test)
 
 mae = mean_absolute_error(y_test, y_pred)
-rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
+rmse = mean_squared_error(y_test, y_pred, squared=False)
 
-col1, col2, col3 = st.columns(3)
-col1.metric("MAE", f"{mae:,.2f}")
-col2.metric("RMSE", f"{rmse:,.2f}")
-col3.metric("MAPE", f"{mape:.2f}%")
+st.write(f"**MAE**: {mae:.2f}")
+st.write(f"**RMSE**: {rmse:.2f}")
 
 # ============================
 # FORECASTING
 # ============================
-st.subheader("📅 Prediksi Masa Depan")
-forecast_horizon = st.slider("Prediksi berapa hari ke depan?", 7, 90, 30)
+forecast_horizon = st.slider("🗓️ Prediksi berapa hari ke depan?", 1, 30, 7)
 
 last_date = df['tanggal_lengkap'].max()
-future_dates = pd.date_range(last_date + pd.Timedelta(days=1), periods=forecast_horizon)
+future_dates = pd.date_range(last_date, periods=forecast_horizon+1, closed='right')
 
 future_df = pd.DataFrame({
     "tanggal_lengkap": future_dates,
@@ -101,36 +98,16 @@ future_df = pd.DataFrame({
 future_pred = model.predict(future_df[["day", "month", "year"]])
 future_df["prediksi_cabai"] = future_pred
 
-# Gabungkan untuk satu grafik
-combined = pd.concat([
-    df[['tanggal_lengkap', 'cabe_merah_besar']],
-    future_df[['tanggal_lengkap', 'prediksi_cabai']]
-])
-
 # ============================
-# VISUALISASI
+# PLOTTING
 # ============================
-st.subheader("📈 Grafik Historis & Prediksi")
+st.subheader("📈 Grafik Prediksi")
 
-fig = go.Figure()
-fig.add_trace(go.Scatter(x=df['tanggal_lengkap'], y=df['cabe_merah_besar'],
-                         mode='lines', name='Historis', line=dict(color='red')))
-fig.add_trace(go.Scatter(x=future_df['tanggal_lengkap'], y=future_df['prediksi_cabai'],
-                         mode='lines', name='Prediksi', line=dict(color='darkred', dash='dot')))
-fig.update_layout(template="plotly_white")
+fig = px.line(df, x="tanggal_lengkap", y="cabe_merah_besar", title="Data Historis", color_discrete_sequence=["red"])
 st.plotly_chart(fig, use_container_width=True)
 
-# ============================
-# DOWNLOAD PREDIKSI
-# ============================
-st.subheader("📥 Download Hasil Prediksi")
-csv = future_df.to_csv(index=False).encode('utf-8')
-st.download_button(label="Download CSV Prediksi 🌶️",
-                   data=csv,
-                   file_name="prediksi_cabai.csv",
-                   mime="text/csv")
+fig2 = px.line(future_df, x="tanggal_lengkap", y="prediksi_cabai", title="Prediksi Harga", color_discrete_sequence=["darkred"])
+st.plotly_chart(fig2, use_container_width=True)
 
-st.success("Prediksi selesai!")
-st.caption("👩‍💻 Model: XGBoost Regression | Dibuat dengan Streamlit")
-
-
+st.success("Prediksi Selesai! 🎉")
+st.write("👩‍💻 Model: XGBoost Regression")
