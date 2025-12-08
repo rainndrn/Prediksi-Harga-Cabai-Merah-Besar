@@ -4,7 +4,7 @@ import numpy as np
 import zipfile
 import joblib
 import os
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
@@ -194,4 +194,5 @@ with tab3:
             st.dataframe(pd.DataFrame({
                 "hari_ke": range(1, n_days+1),
                 "prediksi": lstm_pred.flatten()
+
             }))
