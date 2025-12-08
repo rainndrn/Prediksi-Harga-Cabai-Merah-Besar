@@ -218,16 +218,16 @@ else:
                 ax2.plot(df['tanggal_lengkap'], df['cabe_merah_besar'], label='historis')
             ax2.plot(pred_df['tanggal_lengkap'], pred_df['predicted_mean'], marker='o', label='prediksi')
             if "ci_lower" in pred_df.columns and "ci_upper" in pred_df.columns:
-            ax2.fill_between(
-                pred_df["tanggal_lengkap"],
-                pred_df["ci_lower"],
-                pred_df["ci_upper"],
-            alpha=0.2
-    )
-
+                ax2.fill_between(
+                    pred_df["tanggal_lengkap"],
+                    pred_df["ci_lower"],
+                    pred_df["ci_upper"],
+                    alpha=0.2
+                )
 ax2.set_title("Prediksi SARIMA")
 ax2.set_xlabel("Tanggal")
 ax2.set_ylabel("Harga")
 ax2.legend()
 ax2.grid(True)
 st.pyplot(fig2)
+
