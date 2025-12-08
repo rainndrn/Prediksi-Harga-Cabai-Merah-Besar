@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # ===== Load Model =====
 @st.cache_resource
 def load_sarima():
-    with open("model_sarima.pkl", "rb") as f:
+    with open("model_sarima.zip", "rb") as f:
         model = pickle.load(f)
     return model
 
@@ -42,3 +42,4 @@ if st.button("Prediksi Sekarang"):
 
 st.markdown("---")
 st.info("Model: SARIMA • Dibuat tanpa TensorFlow supaya stabil untuk deployment Streamlit.")
+
