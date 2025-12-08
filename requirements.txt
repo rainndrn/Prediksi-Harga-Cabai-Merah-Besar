@@ -1,7 +1,6 @@
-streamlit
+streamlit>=1.20
 pandas
 numpy
-statsmodels
 matplotlib
-scikit-learn
-joblib
+statsmodels
+plotly
