@@ -231,3 +231,5 @@ ax2.legend()
 ax2.grid(True)
 st.pyplot(fig2)
 
+except Exception as e:
+    st.error(f"Plot error: {e}")
