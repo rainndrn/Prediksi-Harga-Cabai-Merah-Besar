@@ -1,7 +1,7 @@
 streamlit
 pandas
 numpy
+statsmodels
 matplotlib
 scikit-learn
 joblib
-tensorflow-cpu==2.13.0
